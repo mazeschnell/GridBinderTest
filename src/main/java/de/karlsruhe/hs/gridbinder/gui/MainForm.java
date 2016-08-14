@@ -48,8 +48,6 @@ public class MainForm extends javax.swing.JFrame {
         gridBinderPanel1 = new de.karlsruhe.hs.gridbinder.gui.GridBinderPanel();
         buttom_panel = new javax.swing.JPanel();
         cancel_button = new javax.swing.JButton();
-        jToolBar1 = new javax.swing.JToolBar();
-        add_button = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().add(gridBinderPanel1, java.awt.BorderLayout.CENTER);
@@ -63,16 +61,6 @@ public class MainForm extends javax.swing.JFrame {
         buttom_panel.add(cancel_button);
 
         getContentPane().add(buttom_panel, java.awt.BorderLayout.PAGE_END);
-
-        jToolBar1.setRollover(true);
-
-        add_button.setText("Add Context");
-        add_button.setFocusable(false);
-        add_button.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        add_button.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jToolBar1.add(add_button);
-
-        getContentPane().add(jToolBar1, java.awt.BorderLayout.PAGE_START);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -120,10 +108,8 @@ public class MainForm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton add_button;
     private javax.swing.JPanel buttom_panel;
     private javax.swing.JButton cancel_button;
     private de.karlsruhe.hs.gridbinder.gui.GridBinderPanel gridBinderPanel1;
-    private javax.swing.JToolBar jToolBar1;
     // End of variables declaration//GEN-END:variables
 }

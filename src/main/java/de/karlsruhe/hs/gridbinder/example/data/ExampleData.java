@@ -23,9 +23,7 @@
  */
 package de.karlsruhe.hs.gridbinder.example.data;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,19 +43,17 @@ public class ExampleData {
     public char CData;
     public Boolean BData;
     public String SData;
-    public List<String> SListData;
-
+    public List SListData;
     public EnumType EnumData;
-
     public LocalDateTime DtData;
 
     public ExampleData(Integer val) {
-
         this.IData = -43;
         this.IOData = val;
         this.DData = 0.5;
         this.CData = 'A';
         this.BData = false;
+        this.SData = "AB";
         this.EnumData = EnumType.Two;
         this.DtData = LocalDateTime.of(2015, 2, 1, 14, 05);
         this.SListData = new ArrayList();
@@ -73,11 +69,11 @@ public class ExampleData {
         this.IData = IData;
     }
 
-    public int getIOData() {
+    public Integer getIOData() {
         return IOData;
     }
 
-    public void setIOData(int IOData) {
+    public void setIOData(Integer IOData) {
         this.IOData = IOData;
     }
 
@@ -113,11 +109,11 @@ public class ExampleData {
         this.SData = SData;
     }
 
-    public List<String> getSListData() {
+    public List getSListData() {
         return SListData;
     }
 
-    public void setSListData(List<String> SListData) {
+    public void setSListData(List SListData) {
         this.SListData = SListData;
     }
 

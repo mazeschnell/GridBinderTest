@@ -24,51 +24,47 @@
 package de.karlsruhe.hs.gridbinder.databinding;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.table.AbstractTableModel;
 
 /**
- *
+ * Main Databinding Class which also is the custom TableModel for JTabel in GridBinderPanel.class
+ * 
  * @author matthiasschnell
  * @param <T>
  */
 public class GridBinder<T> extends AbstractTableModel {
 
-    private List _columnNames;
-    final private List _data;
-    static int _filterlimit=2;
-    public Boolean Numbered = true;
-    public ArrayList<T> _LDataSource;
+    // Properties
+    private final List _columnNames;
+    private final ArrayList<T> _LDataSource;
+    private final List _isEditable;
 
-    public GridBinder(ArrayList<T> source)  {
+    public GridBinder(ArrayList<T> source) {
+        //Init Properties
         _LDataSource = source;
-       
         _columnNames = new ArrayList<>();
-        _data = new ArrayList<>();
-        
-        for(T obj : _LDataSource) {
-            
-            List valueList = new ArrayList<>();
-            for(Field field : obj.getClass().getFields()) {
-                if( !_columnNames.contains(field.getName().toString())) {
-                    _columnNames.add(field.getName().toString());                    
-                } 
-               
-                try {
-                    valueList.add(field.get(obj));
-                } catch (IllegalArgumentException | IllegalAccessException ex) {
-                    Logger.getLogger(GridBinder.class.getName()).log(Level.SEVERE, null, ex);
+        _isEditable = new ArrayList<>();
+        //Foreach committed Object
+        for (T obj : _LDataSource) {
+            List editableObjectList = new ArrayList<>();
+            // Foreach field of committed object
+            for (Field field : obj.getClass().getFields()) {
+                //check whether fieldname is already present in colmnNames
+                if (!_columnNames.contains(field.getName())) {
+                    _columnNames.add(field.getName());
                 }
+                //Check whether field is editable
+                editableObjectList.add(setIsEditable(field.getName(), obj));
             }
-            _data.add(valueList);
+            _isEditable.add(editableObjectList);
         }
-        
         System.out.print("Column Size is: " + _columnNames.size());
-        
     }
 
     @Override
@@ -78,7 +74,7 @@ public class GridBinder<T> extends AbstractTableModel {
 
     @Override
     public int getRowCount() {
-        return _data.size();
+        return _LDataSource.size();
     }
 
     @Override
@@ -88,34 +84,70 @@ public class GridBinder<T> extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int row, int col) {
-        return ((ArrayList) _data.get(row)).get(col);
+
+        Object value = null;
+        T obj = _LDataSource.get(row);
+        try {
+            //Invoke Method get[Fieldname]
+            value = obj.getClass().getDeclaredMethod("get" + _columnNames.get(col)).invoke(obj);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            Logger.getLogger(GridBinder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return value;
     }
 
     @Override
     public Class getColumnClass(int c) {
-        //return getValueAt(0, c).getClass(); 
-        return String.class;
+        //TODO: Does only work for "well-known" types.
+        return getValueAt(0, c).getClass();
     }
 
-    /*
-     * Don't need to implement this method unless your table's
-     * editable.
-     */
+    
     @Override
     public boolean isCellEditable(int row, int col) {
-        //Note that the data/cell address is constant,
-        //no matter where the cell appears onscreen.
-        return col >= 2;
+        return (Boolean) ((ArrayList) _isEditable.get(row)).get(col);
     }
-
-    /*
-     * Don't need to implement this method unless your table's
-     * data can change.
-     */
+    
     @Override
     public void setValueAt(Object value, int row, int col) {
-        ((ArrayList) _data.get(row)).set(col, value);
+
+        T obj = _LDataSource.get(row);
+        Method setter;
+        try {
+            //Invoke Method set[Fieldname]
+            Class[] targetClass = new Class[]{getColumnClass(col)};
+            //TODO: Does not work for primitiv types
+            setter = obj.getClass().getMethod("set" + _columnNames.get(col), targetClass);
+            setter.setAccessible(true);
+            setter.invoke(obj, value);
+        } catch (NoSuchMethodException ex) {
+            Logger.getLogger(GridBinder.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SecurityException ex) {
+            Logger.getLogger(GridBinder.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(GridBinder.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            Logger.getLogger(GridBinder.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InvocationTargetException ex) {
+            Logger.getLogger(GridBinder.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
         fireTableCellUpdated(row, col);
     }
 
+    /**
+     *  Check if given fieldname has a set[Fieldname] Method in base object
+     * 
+     * @param fieldname
+     * @param baseObject
+     * @return whether set[Fieldname] exist in base object
+     */
+    private static Boolean setIsEditable(String fieldname, Object baseObject) {
+        for (Method method : baseObject.getClass().getMethods()) {
+            if (method.getName().startsWith("set") && method.getName().toLowerCase().endsWith(fieldname.toLowerCase())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
