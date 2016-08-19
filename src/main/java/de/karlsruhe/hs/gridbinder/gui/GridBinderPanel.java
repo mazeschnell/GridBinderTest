@@ -24,36 +24,41 @@
 package de.karlsruhe.hs.gridbinder.gui;
 
 import de.karlsruhe.hs.gridbinder.databinding.GridBinder;
-import de.karlsruhe.hs.gridbinder.databinding.TypeDictionary;
 import de.karlsruhe.hs.gridbinder.example.data.ExampleData;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 /**
  *
  * @author matthiasschnell
  */
 public class GridBinderPanel extends JPanel {
+
     private final ArrayList _data;
     //TODO: Implement Filter/Search
 
     public GridBinderPanel() {
         super(new GridLayout(1, 0));
-        
+
         // Generate some data
-	_data = new ArrayList<>();
-			
-	// Add some dummy data
-	_data.add(new ExampleData(8));
-	_data.add(new ExampleData(null));
-	_data.add(new ExampleData(13));
+        _data = new ArrayList<>();
+
+        // Add some dummy data
+        _data.add(new ExampleData(8));
+        _data.add(new ExampleData(null));
+        _data.add(new ExampleData(13));
 
         // Create JTable with Custom Tablemodel "GridBinder"
         final JTable table = new JTable(new GridBinder(_data));
@@ -61,8 +66,8 @@ public class GridBinderPanel extends JPanel {
         table.setFillsViewportHeight(true);
         //FIXME: Does not include array values in Combobox
         table.setDefaultEditor(ArrayList.class, new DefaultCellEditor(new JComboBox()));
+        table.setDefaultEditor(Enum.class, new DefaultCellEditor(new JComboBox()));
         table.setDefaultEditor(Character.class, new DefaultCellEditor(new JTextField()));
-      
 
         //Create the scroll pane and add the table to it.
         JScrollPane scrollPane = new JScrollPane(table);
