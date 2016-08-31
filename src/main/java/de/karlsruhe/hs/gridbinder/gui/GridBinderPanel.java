@@ -25,20 +25,17 @@ package de.karlsruhe.hs.gridbinder.gui;
 
 import de.karlsruhe.hs.gridbinder.databinding.GridBinder;
 import de.karlsruhe.hs.gridbinder.example.data.ExampleData;
+import de.karlsruhe.hs.gridbinder.gui.components.CustomCheckBoxCellRenderer;
+import de.karlsruhe.hs.gridbinder.gui.components.CustomComboboxModel;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import javax.swing.DefaultCellEditor;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
 
 /**
  *
@@ -59,13 +56,19 @@ public class GridBinderPanel extends JPanel {
         _data.add(new ExampleData(8));
         _data.add(new ExampleData(null));
         _data.add(new ExampleData(13));
-
+     
         // Create JTable with Custom Tablemodel "GridBinder"
-        final JTable table = new JTable(new GridBinder(_data));
+        GridBinder gridBinder = new GridBinder(_data);
+      
+        final JTable table = new JTable(gridBinder);
         table.setPreferredScrollableViewportSize(new Dimension(500, 70));
         table.setFillsViewportHeight(true);
+        table.setAutoCreateRowSorter(true);
         //FIXME: Does not include array values in Combobox
-        table.setDefaultEditor(ArrayList.class, new DefaultCellEditor(new JComboBox()));
+        JComboBox combo = new JComboBox(new CustomComboboxModel(null));
+        table.setDefaultEditor(ArrayList.class, new DefaultCellEditor(combo));
+        table.setDefaultRenderer(ArrayList.class, new CustomCheckBoxCellRenderer(combo));
+
         table.setDefaultEditor(Enum.class, new DefaultCellEditor(new JComboBox()));
         table.setDefaultEditor(Character.class, new DefaultCellEditor(new JTextField()));
 

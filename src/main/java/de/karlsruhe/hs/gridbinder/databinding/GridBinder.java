@@ -26,9 +26,7 @@ package de.karlsruhe.hs.gridbinder.databinding;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -126,19 +124,19 @@ public class GridBinder<T> extends AbstractTableModel {
             }
         });
         // Init List Type Handler
-         _setTypeHandler.put(Character.class, (SetTypeHandler) (Object target, String columnName, Class[] params, Object value) -> {
+         _setTypeHandler.put(ArrayList.class, (SetTypeHandler) (Object target, String columnName, Class[] params, Object value) -> {
             Method setter;
             try {
                 //Invoke Method set[Fieldname]
                 setter = target.getClass().getMethod("set" + columnName, params);
                 setter.setAccessible(true);
-                setter.invoke(target, value.toString().charAt(0));
+                setter.invoke(target, value);
             } catch (NoSuchMethodException ex) {
-                //Try to invoke with ArrayList type
+                //Try to invoke with List type
                 try {
-                    setter = target.getClass().getMethod("set" + columnName, new Class[]{ArrayList.class});
+                    setter = target.getClass().getMethod("set" + columnName, new Class[]{List.class});
                     setter.setAccessible(true);
-                    setter.invoke(target, value.toString().charAt(0));
+                    setter.invoke(target, value);
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex1) {
                     Logger.getLogger(GridBinder.class.getName()).log(Level.SEVERE, null, ex1);
                 }
@@ -167,7 +165,7 @@ public class GridBinder<T> extends AbstractTableModel {
             }
             _isEditable.add(editableFieldList);
         }
-        System.out.print("Column Size is: " + _columnNames.size());
+        System.out.println("Column Size is: " + _columnNames.size());
     }
 
     @Override
@@ -204,7 +202,7 @@ public class GridBinder<T> extends AbstractTableModel {
 
     @Override
     public Class getColumnClass(int c) {
-        //TODO: Does only work for "well-known" types.
+        //TODO: Does only work for "well-known" and handelt primitiv types.
         return getValueAt(0, c).getClass();
     }
 
